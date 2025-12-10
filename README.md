@@ -25,7 +25,7 @@ A small collection of ready-to-upload Arduino sketches that demonstrate common t
 - **Wiring:** Connect segments A–G to pins `8, 7, 6, 5, 4, 3, 2` respectively; tie the display cathode to GND through an appropriate resistor network.
 - **Behavior:** Counts upward once per second, lighting only the segments needed for each digit.
 
-### 4) Button-driven state machine (state_machine.ino)
+### 4) Button-driven state machine (state_machine.ino / state_machine.cpp)
 - **What it shows:** A simple finite state machine with debounced input and non-blocking timing via `millis()`.
 - **Wiring:** Momentary button between pin `2` and GND (internal pull-up enabled); use the built-in LED on `LED_BUILTIN`.
 - **Behavior:**
