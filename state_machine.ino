@@ -1,8 +1,16 @@
-// Finite state machine demo: Idle -> Arming -> Armed -> Firing -> Idle
-// Uses non-blocking timing with millis(); button on D2 steps through states.
+// Finite state machine demo: Idle -> Arming -> Armed -> Firing -> Idle.
+// Wire a momentary push button between digital pin 2 and GND (internal pull-up enabled).
+// Uses millis() for non-blocking timing and debounced button edges to advance the state.
 
-const uint8_t LED_PIN    = LED_BUILTIN;
-const uint8_t BUTTON_PIN = 2;  // wire button to GND, uses internal pull-up
+#include <Arduino.h>
+
+const uint8_t LED_PIN = LED_BUILTIN;
+const uint8_t BUTTON_PIN = 2;
+const unsigned long ARMING_DURATION_MS = 3000;
+const unsigned long FIRING_DURATION_MS = 2000;
+const unsigned long ARMING_BLINK_PERIOD_MS = 500;
+const unsigned long FIRING_BLINK_PERIOD_MS = 120;
+const unsigned long DEBOUNCE_MS = 20;
 
 enum class State { Idle, Arming, Armed, Firing };
 State currentState = State::Idle;
@@ -11,6 +19,10 @@ unsigned long stateStartedAt = 0;
 unsigned long lastButtonRead = 0;
 bool lastButtonState = HIGH;
 bool buttonPressed = false;
+
+void transitionTo(State next);
+void readButton();
+void blink(unsigned long periodMs);
 
 void setup() {
   pinMode(LED_PIN, OUTPUT);
@@ -27,9 +39,9 @@ void loop() {
       if (buttonPressed) transitionTo(State::Arming);
       break;
 
-    case State::Arming:  // slow blink for 3s
-      blink(500);
-      if (millis() - stateStartedAt >= 3000) transitionTo(State::Armed);
+    case State::Arming:  // slow blink for 3 s
+      blink(ARMING_BLINK_PERIOD_MS);
+      if (millis() - stateStartedAt >= ARMING_DURATION_MS) transitionTo(State::Armed);
       break;
 
     case State::Armed:  // steady on, wait for trigger
@@ -37,9 +49,9 @@ void loop() {
       if (buttonPressed) transitionTo(State::Firing);
       break;
 
-    case State::Firing:  // rapid blink for 2s, then reset
-      blink(120);
-      if (millis() - stateStartedAt >= 2000) transitionTo(State::Idle);
+    case State::Firing:  // rapid blink for 2 s, then reset
+      blink(FIRING_BLINK_PERIOD_MS);
+      if (millis() - stateStartedAt >= FIRING_DURATION_MS) transitionTo(State::Idle);
       break;
   }
 
@@ -52,8 +64,7 @@ void transitionTo(State next) {
 }
 
 void readButton() {
-  // basic debounce (20 ms)
-  const unsigned long debounceMs = 20;
+  // basic debounce on a falling edge (button press)
   bool raw = digitalRead(BUTTON_PIN);
   unsigned long now = millis();
 
@@ -61,8 +72,10 @@ void readButton() {
     lastButtonRead = now;
     lastButtonState = raw;
   }
-  if ((now - lastButtonRead) > debounceMs && raw == LOW) {
-    buttonPressed = true;  // register press on falling edge
+
+  bool stableLow = (now - lastButtonRead) > DEBOUNCE_MS && raw == LOW;
+  if (stableLow) {
+    buttonPressed = true;
   }
 }
 
