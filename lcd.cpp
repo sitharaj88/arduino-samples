@@ -1,56 +1,55 @@
+// 16x2 LCD marquee demo using LiquidCrystal.
+// Wire RS->12, EN->11, D4->5, D5->4, D6->3, D7->2 and a 10k trim pot for contrast.
+// The sketch scrolls a friendly greeting left, right, then returns to center.
+
+#include <Arduino.h>
 #include <LiquidCrystal.h>
 
-#define RS 12
-#define EN 11
-#define  D4 5
-#define D5 4
-#define  D6 3
-#define D7 2
+constexpr uint8_t RS_PIN = 12;
+constexpr uint8_t EN_PIN = 11;
+constexpr uint8_t D4_PIN = 5;
+constexpr uint8_t D5_PIN = 4;
+constexpr uint8_t D6_PIN = 3;
+constexpr uint8_t D7_PIN = 2;
 
-#define LCD_CHAR_LENGTH 16
-#define NO_LCD_LINES 2
+constexpr uint8_t LCD_COLUMNS = 16;
+constexpr uint8_t LCD_ROWS = 2;
+constexpr unsigned long SCROLL_DELAY_MS = 150;
+constexpr unsigned long PAUSE_BETWEEN_CYCLES_MS = 1000;
 
-void scrollLeft();
-void scrollRight();
-void scrollToInitialPosition();
+LiquidCrystal lcd(RS_PIN, EN_PIN, D4_PIN, D5_PIN, D6_PIN, D7_PIN);
+const String MESSAGE = "Hello, Friends!!";  // shorter than 2 rows to keep the animation smooth
 
-LiquidCrystal lcd(RS, EN, D4, D5, D6, D7);
-
-int positionCounter = 0;
-String text  = "Hello, Friends!!";
-int textLength = text.length();
+void scrollLeft(uint8_t steps);
+void scrollRight(uint8_t steps);
 
 void setup() {
-  lcd.begin(LCD_CHAR_LENGTH, NO_LCD_LINES);
-  lcd.print(text);
-  delay(1000);
+  lcd.begin(LCD_COLUMNS, LCD_ROWS);
+  lcd.print(MESSAGE);
+  delay(PAUSE_BETWEEN_CYCLES_MS);
 }
 
 void loop() {
-  scrollLeft();
-  scrollRight();
-  scrollToInitialPosition();
-  delay(1000);
+  // move message fully off-screen to the left
+  scrollLeft(LCD_COLUMNS);
+  // then fully off-screen to the right (text length + display width)
+  scrollRight(LCD_COLUMNS + MESSAGE.length());
+  // and finally back to the starting position
+  scrollLeft(LCD_COLUMNS);
+
+  delay(PAUSE_BETWEEN_CYCLES_MS);
 }
 
-void scrollLeft() {
-  for (positionCounter = 0; positionCounter < LCD_CHAR_LENGTH; positionCounter++) {
+void scrollLeft(uint8_t steps) {
+  for (uint8_t i = 0; i < steps; i++) {
     lcd.scrollDisplayLeft();
-    delay(150);
+    delay(SCROLL_DELAY_MS);
   }
 }
 
-void scrollRight() {
-  int maxScroll = LCD_CHAR_LENGTH + textLength;
-  for (positionCounter = 0; positionCounter < maxScroll; positionCounter++) {
+void scrollRight(uint8_t steps) {
+  for (uint8_t i = 0; i < steps; i++) {
     lcd.scrollDisplayRight();
-    delay(150);
-  }
-}
-
-void scrollToInitialPosition() {
-  for (positionCounter = 0; positionCounter < LCD_CHAR_LENGTH; positionCounter++) {
-    lcd.scrollDisplayLeft();
-    delay(150);
+    delay(SCROLL_DELAY_MS);
   }
 }

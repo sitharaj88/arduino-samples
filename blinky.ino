@@ -1,17 +1,21 @@
-const char LED = 13;
+// Basic blink example.
+// Connect the on-board LED (or any LED + resistor) to digital pin 13.
+// The sketch toggles the LED every second using blocking delays for clarity.
+
+#include <Arduino.h>
+
+const uint8_t LED_PIN = 13;  // most Arduino boards expose the on-board LED here
+const unsigned long BLINK_DELAY_MS = 1000;
 
 void setup() {
-  //make pin 13 as output
-  pinMode(LED, OUTPUT); 
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);  // start in a known state
 }
 
 void loop() {
-  //LED "ON"
-  digitalWrite(LED, HIGH);
-  //wait 1 sec
-  delay(1000);
-  //LED "OFF"
-  digitalWrite(LED, LOW);
-  //wait 1 sec
-  delay(1000);
+  digitalWrite(LED_PIN, HIGH);
+  delay(BLINK_DELAY_MS);
+
+  digitalWrite(LED_PIN, LOW);
+  delay(BLINK_DELAY_MS);
 }
