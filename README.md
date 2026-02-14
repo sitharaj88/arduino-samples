@@ -34,7 +34,45 @@ A small collection of ready-to-upload Arduino sketches that demonstrate common t
   - **Armed:** LED on solid; button press advances to Firing.
   - **Firing:** Fast blink for 2 seconds, then return to Idle.
 
+
+### 5) Traffic light controller (traffic_light.ino / traffic_light.cpp)
+- **What it shows:** A timed finite-state machine controlling multiple outputs without `delay()`.
+- **Wiring:** Red LED→`10`, Yellow LED→`9`, Green LED→`8` (each LED in series with ~220 Ω resistor to GND).
+- **Behavior:** Cycles Green (5 s) → Yellow (1.5 s) → Red (4 s), then repeats.
+
+### 6) Potentiometer PWM dimmer (pwm_dimmer.ino / pwm_dimmer.cpp)
+- **What it shows:** Mapping analog sensor input to PWM brightness output.
+- **Wiring:** Potentiometer ends to 5V/GND with wiper to `A0`; LED + resistor from PWM pin `9` to GND.
+- **Behavior:** Rotating the potentiometer smoothly changes LED brightness.
+
 ## Tips
 - If you change the pin assignments, update the `constexpr` pin constants at the top of each sketch.
 - For boards with a different built-in LED pin, set `LED_PIN` accordingly.
 - Use a common-ground reference when powering external components (LCD, 7-seg display, buttons) from separate supplies.
+
+## Suggested next samples
+If you want to grow this collection, these are high-value additions that stay beginner-friendly while introducing practical patterns:
+
+1. **Servo sweep with easing (`servo_sweep.ino`)**
+   - Teaches the `Servo` library and safe power/wiring practices.
+   - Can include both blocking and non-blocking movement styles.
+
+2. **Ultrasonic distance meter (`ultrasonic_distance.ino`)**
+   - Teaches timing pulses (`pulseIn`) and converting time-of-flight to centimeters.
+   - Easy to pair with serial output and LED/LCD feedback.
+
+3. **Serial command parser (`serial_commands.ino`)**
+   - Teaches reading text commands from Serial Monitor (e.g., `LED ON`, `LED OFF`, `BLINK 250`).
+   - Introduces robust parsing and validation without advanced dependencies.
+
+4. **Non-blocking multi-task loop (`millis_scheduler.ino`)**
+   - Teaches scheduling several periodic tasks without `delay()`.
+   - Reinforces production-style Arduino structure and responsiveness.
+
+5. **I2C sensor basics (`i2c_bme280.ino` or `i2c_bh1750.ino`)**
+   - Teaches I2C wiring, external libraries, and structured sensor reads.
+   - Good first step toward IoT-style projects.
+
+6. **EEPROM settings example (`eeprom_settings.ino`)**
+   - Teaches persistent configuration storage and data validation on boot.
+   - Useful for mode/state retention across resets.
